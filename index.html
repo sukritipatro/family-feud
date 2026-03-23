@@ -1,0 +1,1950 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Family Feud</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='12' fill='%230a1628'/><text y='72' x='50' text-anchor='middle' font-size='60' font-family='serif'>🏆</text></svg>">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Oswald:wght@400;600;700&family=Barlow+Condensed:wght@400;600;700&display=swap" rel="stylesheet"/>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --gold: #f5c518;
+    --gold2: #e0a800;
+    --blue: #0a1628;
+    --blue2: #0d2040;
+    --blue3: #1a3a6e;
+    --red: #cc2200;
+    --red2: #ff3300;
+    --white: #fff;
+    --silver: #c0c8d8;
+    --green: #1a8a2a;
+    --shadow: 0 4px 32px rgba(0,0,0,0.7);
+  }
+  body {
+    font-family: 'Oswald', sans-serif;
+    background: var(--blue);
+    color: var(--white);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+  /* LOBBY */
+  .lobby {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: radial-gradient(ellipse at 50% 0%, #1a3a6e 0%, #0a1628 70%);
+    padding: 24px;
+  }
+  .lobby-title {
+    font-family: 'Anton', sans-serif;
+    font-size: clamp(2.5rem, 8vw, 5rem);
+    letter-spacing: 4px;
+    color: var(--gold);
+    text-shadow: 0 0 40px rgba(245,197,24,0.5), 3px 3px 0 #8a6a00;
+    margin-bottom: 8px;
+    text-align: center;
+  }
+  .lobby-sub {
+    font-size: 1rem;
+    color: var(--silver);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 36px;
+  }
+  .teams-row {
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-bottom: 32px;
+    width: 100%;
+    max-width: 900px;
+  }
+  .team-card {
+    flex: 1;
+    min-width: 260px;
+    max-width: 380px;
+    background: rgba(255,255,255,0.04);
+    border: 2px solid var(--blue3);
+    border-radius: 12px;
+    padding: 24px;
+  }
+  .team-card h3 {
+    font-family: 'Anton', sans-serif;
+    font-size: 1.3rem;
+    color: var(--gold);
+    margin-bottom: 12px;
+    letter-spacing: 2px;
+  }
+  .input-label { font-size: 0.75rem; color: var(--silver); letter-spacing: 2px; margin-bottom: 4px; }
+  .text-input {
+    width: 100%;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid var(--blue3);
+    border-radius: 6px;
+    color: var(--white);
+    padding: 10px 12px;
+    font-family: 'Oswald', sans-serif;
+    font-size: 1rem;
+    margin-bottom: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .text-input:focus { border-color: var(--gold); }
+  .emoji-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 14px;
+  }
+  .emoji-btn {
+    font-size: 1.4rem;
+    background: rgba(255,255,255,0.06);
+    border: 2px solid transparent;
+    border-radius: 6px;
+    cursor: pointer;
+    padding: 4px 8px;
+    transition: all 0.15s;
+  }
+  .emoji-btn:hover { background: rgba(245,197,24,0.15); }
+  .emoji-btn.selected { border-color: var(--gold); background: rgba(245,197,24,0.2); }
+  /* QUESTIONS EDITOR */
+  .qs-section {
+    width: 100%;
+    max-width: 900px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--blue3);
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 24px;
+  }
+  .qs-section h3 {
+    font-family: 'Anton', sans-serif;
+    color: var(--gold);
+    font-size: 1.2rem;
+    letter-spacing: 2px;
+    margin-bottom: 16px;
+  }
+  .round-block {
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+  .round-block h4 {
+    font-size: 0.85rem;
+    color: var(--gold);
+    letter-spacing: 2px;
+    margin-bottom: 10px;
+  }
+  .answer-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+  }
+  .answer-row .text-input { flex: 1; min-width: 140px; margin-bottom: 0; }
+  .pts-input {
+    width: 72px;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid var(--blue3);
+    border-radius: 6px;
+    color: var(--gold);
+    padding: 10px 8px;
+    font-family: 'Oswald', sans-serif;
+    font-size: 1rem;
+    text-align: center;
+    outline: none;
+  }
+  .pts-input:focus { border-color: var(--gold); }
+  .remove-btn {
+    background: rgba(204,34,0,0.3);
+    border: 1px solid var(--red);
+    color: var(--red2);
+    border-radius: 6px;
+    cursor: pointer;
+    padding: 8px 12px;
+    font-size: 1rem;
+    transition: all 0.15s;
+  }
+  .remove-btn:hover { background: rgba(204,34,0,0.6); }
+  .add-btn {
+    background: rgba(26,138,42,0.2);
+    border: 1px solid var(--green);
+    color: #5dfc78;
+    border-radius: 6px;
+    cursor: pointer;
+    padding: 7px 14px;
+    font-family: 'Oswald', sans-serif;
+    font-size: 0.85rem;
+    letter-spacing: 1px;
+    margin-top: 4px;
+    transition: all 0.15s;
+  }
+  .add-btn:hover { background: rgba(26,138,42,0.4); }
+  .start-btn {
+    background: linear-gradient(135deg, var(--gold) 0%, var(--gold2) 100%);
+    color: var(--blue);
+    border: none;
+    border-radius: 10px;
+    font-family: 'Anton', sans-serif;
+    font-size: 1.5rem;
+    letter-spacing: 3px;
+    padding: 16px 60px;
+    cursor: pointer;
+    box-shadow: 0 4px 24px rgba(245,197,24,0.4);
+    transition: all 0.2s;
+    text-transform: uppercase;
+  }
+  .start-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(245,197,24,0.6); }
+  /* MAIN GAME SCREEN */
+  .game-screen {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: radial-gradient(ellipse at 50% 0%, #1a3a6e 0%, #0a1628 80%);
+  }
+  .scores-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 24px;
+    background: var(--blue2);
+    border-bottom: 3px solid var(--gold);
+  }
+  .team-score-block { text-align: center; }
+  .team-score-name {
+    font-family: 'Anton', sans-serif;
+    font-size: 1.1rem;
+    letter-spacing: 2px;
+    color: var(--silver);
+  }
+  .team-score-pts {
+    font-family: 'Anton', sans-serif;
+    font-size: 2.2rem;
+    color: var(--gold);
+    line-height: 1;
+    text-shadow: 0 0 20px rgba(245,197,24,0.5);
+  }
+  .team-score-pts.active { color: #7fff7f; text-shadow: 0 0 20px rgba(100,255,100,0.5); }
+  .game-logo {
+    font-family: 'Anton', sans-serif;
+    font-size: 1.5rem;
+    letter-spacing: 4px;
+    color: var(--gold);
+    text-align: center;
+  }
+  .center-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 20px 16px;
+  }
+  .phase-label {
+    font-size: 0.8rem;
+    letter-spacing: 4px;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    opacity: 0.8;
+  }
+  .question-box {
+    background: linear-gradient(135deg, var(--blue3), #0f2856);
+    border: 3px solid var(--gold);
+    border-radius: 12px;
+    padding: 18px 30px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: clamp(1.1rem, 3vw, 1.6rem);
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-align: center;
+    max-width: 800px;
+    width: 100%;
+    margin-bottom: 20px;
+    box-shadow: 0 0 30px rgba(245,197,24,0.2);
+    text-transform: uppercase;
+  }
+  .answers-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 10px;
+    width: 100%;
+    max-width: 860px;
+    margin-bottom: 20px;
+  }
+  .answer-tile {
+    background: linear-gradient(135deg, #0d2040, #0a1628);
+    border: 2px solid var(--blue3);
+    border-radius: 8px;
+    padding: 14px 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: all 0.2s;
+    position: relative;
+    overflow: hidden;
+    min-height: 58px;
+  }
+  .answer-tile:hover:not(.revealed) { border-color: var(--gold); background: linear-gradient(135deg, #163060, #0d2040); }
+  .answer-tile.revealed {
+    background: linear-gradient(135deg, #1a3a6e, #0f2856);
+    border-color: var(--gold);
+    cursor: default;
+  }
+  .answer-tile .rank {
+    font-family: 'Anton', sans-serif;
+    font-size: 1.4rem;
+    color: rgba(255,255,255,0.2);
+    min-width: 28px;
+  }
+  .answer-tile.revealed .rank { color: var(--gold); }
+  .answer-tile .ans-text {
+    flex: 1;
+    text-align: center;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: transparent;
+  }
+  .answer-tile.revealed .ans-text { color: var(--white); }
+  .answer-tile .ans-pts {
+    font-family: 'Anton', sans-serif;
+    font-size: 1.3rem;
+    color: transparent;
+    min-width: 36px;
+    text-align: right;
+  }
+  .answer-tile.revealed .ans-pts { color: var(--gold); }
+  /* Strikes */
+  .strikes-row {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 16px;
+    align-items: center;
+  }
+  .strike-x {
+    font-family: 'Anton', sans-serif;
+    font-size: 2.5rem;
+    color: rgba(255,255,255,0.1);
+    line-height: 1;
+    transition: all 0.3s;
+  }
+  .strike-x.active {
+    color: var(--red2);
+    text-shadow: 0 0 20px rgba(255,51,0,0.8);
+    transform: scale(1.2);
+  }
+  /* Host controls */
+  .host-controls {
+    width: 100%;
+    max-width: 860px;
+    background: rgba(0,0,0,0.4);
+    border: 1px solid var(--blue3);
+    border-radius: 10px;
+    padding: 14px 18px;
+    margin-top: 4px;
+  }
+  .host-controls h4 {
+    font-size: 0.75rem;
+    color: var(--gold);
+    letter-spacing: 3px;
+    margin-bottom: 10px;
+  }
+  .hc-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+  .hc-btn {
+    background: rgba(255,255,255,0.08);
+    border: 1px solid var(--blue3);
+    border-radius: 6px;
+    color: var(--white);
+    padding: 8px 16px;
+    font-family: 'Oswald', sans-serif;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.15s;
+    letter-spacing: 1px;
+  }
+  .hc-btn:hover { background: rgba(255,255,255,0.15); border-color: var(--gold); }
+  .hc-btn.gold { background: rgba(245,197,24,0.2); border-color: var(--gold); color: var(--gold); }
+  .hc-btn.gold:hover { background: rgba(245,197,24,0.4); }
+  .hc-btn.red { background: rgba(204,34,0,0.2); border-color: var(--red); color: var(--red2); }
+  .hc-btn.red:hover { background: rgba(204,34,0,0.4); }
+  .hc-btn.green { background: rgba(26,138,42,0.2); border-color: var(--green); color: #5dfc78; }
+  .hc-btn.green:hover { background: rgba(26,138,42,0.4); }
+  .hc-btn.disabled { opacity: 0.4; cursor: not-allowed; }
+  /* Buzz display */
+  .buzz-display {
+    background: rgba(245,197,24,0.1);
+    border: 2px solid var(--gold);
+    border-radius: 10px;
+    padding: 10px 22px;
+    text-align: center;
+    margin-bottom: 12px;
+    font-family: 'Anton', sans-serif;
+    font-size: 1.2rem;
+    color: var(--gold);
+    letter-spacing: 2px;
+  }
+  /* TEAM PHONE SCREEN */
+  .phone-screen {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: radial-gradient(ellipse at 50% 30%, #0d2040 0%, #050e1a 100%);
+    padding: 24px;
+  }
+  .phone-team-name {
+    font-family: 'Anton', sans-serif;
+    font-size: 2rem;
+    color: var(--gold);
+    letter-spacing: 3px;
+    margin-bottom: 4px;
+  }
+  .phone-question {
+    background: rgba(255,255,255,0.05);
+    border: 2px solid var(--blue3);
+    border-radius: 10px;
+    padding: 18px 24px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 1.3rem;
+    font-weight: 700;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin: 20px 0;
+    max-width: 380px;
+    width: 100%;
+  }
+  .buzz-btn {
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    background: radial-gradient(circle, #cc2200, #7a0000);
+    border: 6px solid rgba(255,100,50,0.5);
+    color: var(--white);
+    font-family: 'Anton', sans-serif;
+    font-size: 2rem;
+    letter-spacing: 3px;
+    cursor: pointer;
+    transition: all 0.15s;
+    box-shadow: 0 0 40px rgba(204,34,0,0.5);
+    text-transform: uppercase;
+  }
+  .buzz-btn:hover { transform: scale(1.06); box-shadow: 0 0 60px rgba(204,34,0,0.8); }
+  .buzz-btn:active { transform: scale(0.95); }
+  .buzz-btn.buzzed {
+    background: radial-gradient(circle, #1a8a2a, #0a4a15);
+    border-color: rgba(90,255,90,0.5);
+    box-shadow: 0 0 60px rgba(26,138,42,0.8);
+  }
+  /* FAST MONEY */
+  .fm-screen {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 24px 16px;
+    background: radial-gradient(ellipse at 50% 0%, #2a0a4a 0%, #0a1628 70%);
+  }
+  .fm-title {
+    font-family: 'Anton', sans-serif;
+    font-size: clamp(2rem, 6vw, 3.5rem);
+    color: var(--gold);
+    letter-spacing: 6px;
+    text-shadow: 0 0 40px rgba(245,197,24,0.5);
+    margin-bottom: 4px;
+    text-transform: uppercase;
+  }
+  .fm-subtitle {
+    font-size: 0.85rem;
+    letter-spacing: 3px;
+    color: var(--silver);
+    margin-bottom: 24px;
+  }
+  .fm-player-row {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-bottom: 20px;
+  }
+  .fm-player-box {
+    flex: 1;
+    min-width: 280px;
+    max-width: 500px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--blue3);
+    border-radius: 12px;
+    padding: 20px;
+  }
+  .fm-player-box h3 {
+    font-family: 'Anton', sans-serif;
+    font-size: 1.1rem;
+    color: var(--gold);
+    letter-spacing: 2px;
+    margin-bottom: 14px;
+  }
+  .fm-q-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 12px;
+    padding: 10px;
+    background: rgba(255,255,255,0.04);
+    border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.06);
+  }
+  .fm-q-row.active-q { border-color: var(--gold); background: rgba(245,197,24,0.07); }
+  .fm-q-num {
+    font-family: 'Anton', sans-serif;
+    color: var(--gold);
+    font-size: 1.1rem;
+    min-width: 24px;
+  }
+  .fm-q-text {
+    flex: 1;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: var(--silver);
+    line-height: 1.3;
+  }
+  .fm-ans-area {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    align-items: flex-end;
+    min-width: 120px;
+  }
+  .fm-answer-input {
+    width: 120px;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid var(--blue3);
+    border-radius: 5px;
+    color: var(--white);
+    padding: 6px 8px;
+    font-family: 'Oswald', sans-serif;
+    font-size: 0.85rem;
+    outline: none;
+  }
+  .fm-answer-input:focus { border-color: var(--gold); }
+  .fm-pts-badge {
+    background: var(--gold);
+    color: var(--blue);
+    border-radius: 4px;
+    padding: 2px 8px;
+    font-family: 'Anton', sans-serif;
+    font-size: 0.9rem;
+    min-width: 40px;
+    text-align: center;
+  }
+  .fm-pts-badge.zero { background: rgba(255,255,255,0.15); color: rgba(255,255,255,0.5); }
+  .fm-total-bar {
+    background: rgba(245,197,24,0.12);
+    border: 2px solid var(--gold);
+    border-radius: 10px;
+    padding: 10px 24px;
+    text-align: center;
+    font-family: 'Anton', sans-serif;
+    font-size: 1.5rem;
+    color: var(--gold);
+    letter-spacing: 2px;
+    margin-top: 12px;
+  }
+  .timer-bar {
+    width: 100%;
+    max-width: 400px;
+    height: 10px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 5px;
+    overflow: hidden;
+    margin-bottom: 20px;
+  }
+  .timer-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--green), var(--gold), var(--red2));
+    transition: width 1s linear;
+    border-radius: 5px;
+  }
+  /* FINAL SCREEN */
+  .final-screen {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: radial-gradient(ellipse at 50% 50%, #1a3a6e 0%, #0a1628 80%);
+    padding: 24px;
+  }
+  .final-title {
+    font-family: 'Anton', sans-serif;
+    font-size: clamp(1.5rem, 5vw, 3rem);
+    letter-spacing: 4px;
+    color: var(--gold);
+    text-align: center;
+    margin-bottom: 32px;
+    text-shadow: 0 0 40px rgba(245,197,24,0.6);
+  }
+  .final-scores {
+    display: flex;
+    gap: 32px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-bottom: 32px;
+  }
+  .final-team-card {
+    background: rgba(255,255,255,0.04);
+    border: 3px solid var(--blue3);
+    border-radius: 16px;
+    padding: 32px 40px;
+    text-align: center;
+    transition: all 0.3s;
+  }
+  .final-team-card.winner {
+    border-color: var(--gold);
+    background: rgba(245,197,24,0.1);
+    box-shadow: 0 0 60px rgba(245,197,24,0.3);
+  }
+  .final-emoji { font-size: 3rem; margin-bottom: 8px; }
+  .final-name {
+    font-family: 'Anton', sans-serif;
+    font-size: 1.8rem;
+    color: var(--white);
+    letter-spacing: 2px;
+  }
+  .final-pts {
+    font-family: 'Anton', sans-serif;
+    font-size: 4rem;
+    color: var(--gold);
+    line-height: 1;
+  }
+  .final-winner-badge {
+    background: var(--gold);
+    color: var(--blue);
+    border-radius: 20px;
+    padding: 4px 16px;
+    font-family: 'Anton', sans-serif;
+    font-size: 1rem;
+    letter-spacing: 2px;
+    margin-top: 8px;
+    display: inline-block;
+  }
+  /* Notifications */
+  .toast {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--gold);
+    color: var(--blue);
+    font-family: 'Anton', sans-serif;
+    font-size: 1.2rem;
+    letter-spacing: 2px;
+    padding: 12px 28px;
+    border-radius: 8px;
+    z-index: 9999;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.5);
+    animation: toastIn 0.3s ease;
+  }
+  @keyframes toastIn { from { opacity:0; transform: translateX(-50%) translateY(-10px); } to { opacity:1; transform: translateX(-50%) translateY(0); } }
+  .section-divider {
+    width: 60px; height: 3px;
+    background: var(--gold);
+    border-radius: 2px;
+    margin: 8px auto 20px;
+  }
+  /* STEAL OVERLAY */
+  .steal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.75);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    padding: 24px;
+  }
+  .steal-box {
+    background: linear-gradient(135deg, #1a0a2e, #0a1628);
+    border: 3px solid var(--gold);
+    border-radius: 16px;
+    padding: 36px 40px;
+    max-width: 480px;
+    width: 100%;
+    text-align: center;
+    box-shadow: 0 0 60px rgba(245,197,24,0.3);
+  }
+  .steal-box h2 {
+    font-family: 'Anton', sans-serif;
+    font-size: 2rem;
+    color: var(--gold);
+    letter-spacing: 3px;
+    margin-bottom: 8px;
+  }
+  .steal-box p { color: var(--silver); margin-bottom: 20px; }
+  /* Responsive tweaks */
+  @media (max-width: 600px) {
+    .answers-grid { grid-template-columns: 1fr 1fr; }
+    .hc-row { gap: 6px; }
+    .hc-btn { font-size: 0.8rem; padding: 7px 10px; }
+  }
+  .answer-tile.clickable-faceoff {
+    border-color: rgba(245,197,24,0.5);
+    cursor: pointer;
+    animation: pulse-border 1.5s ease-in-out infinite;
+  }
+  @keyframes pulse-border {
+    0%, 100% { border-color: rgba(245,197,24,0.3); box-shadow: none; }
+    50% { border-color: var(--gold); box-shadow: 0 0 12px rgba(245,197,24,0.3); }
+  }
+  select.text-input { appearance: none; }
+  /* QR Modal */
+  .qr-modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.8);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 200; padding: 24px;
+  }
+  .qr-modal {
+    background: var(--blue2);
+    border: 3px solid var(--gold);
+    border-radius: 16px;
+    padding: 32px 36px;
+    text-align: center;
+    max-width: 340px;
+    width: 100%;
+    box-shadow: 0 0 60px rgba(245,197,24,0.3);
+  }
+  .qr-modal h2 {
+    font-family: 'Anton', sans-serif;
+    font-size: 1.6rem;
+    color: var(--gold);
+    letter-spacing: 3px;
+    margin-bottom: 4px;
+  }
+  .qr-modal p { color: var(--silver); font-size: 0.85rem; margin-bottom: 16px; }
+  .qr-code-box {
+    background: #fff;
+    border-radius: 8px;
+    padding: 12px;
+    display: inline-block;
+    margin-bottom: 16px;
+  }
+  .qr-url {
+    font-size: 0.7rem;
+    color: var(--silver);
+    word-break: break-all;
+    margin-bottom: 16px;
+    background: rgba(255,255,255,0.05);
+    padding: 6px 10px;
+    border-radius: 6px;
+  }
+  /* Join screen */
+  .join-screen {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: radial-gradient(ellipse at 50% 30%, #0d2040 0%, #050e1a 100%);
+    padding: 24px;
+  }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { useState, useEffect, useRef, useCallback } = React;
+
+// ─── Default Fast Money Questions ───────────────────────────────────────────
+const FM_QUESTIONS_POOL = [
+  { q: "Name something you do in the shower.", answers: [
+    { text: "Sing", pts: 40, aliases: ["sing","singing","sang","song","music","hum","humming","vocalize","perform"] },
+    { text: "Wash hair", pts: 24, aliases: ["wash hair","shampoo","hair","conditioner","lather hair","rinse hair","shampoo hair"] },
+    { text: "Wash body / soap up", pts: 16, aliases: ["wash","soap","scrub","body","clean","lather","bathe","bathing","washing","sponge"] },
+    { text: "Think / daydream", pts: 9, aliases: ["think","thinking","daydream","plan","dream","meditate","reflect","zone out","ponder","contemplate"] },
+    { text: "Relax", pts: 5, aliases: ["relax","relaxing","unwind","chill","just stand","enjoy","stand there","decompress"] },
+    { text: "Dance", pts: 3, aliases: ["dance","dancing","groove","move","boogie"] },
+    { text: "Shave", pts: 2, aliases: ["shave","shaving","razor","shave legs","shave face"] },
+    { text: "Cry", pts: 1, aliases: ["cry","crying","weep","sob","tears"] },
+  ]},
+  { q: "Name something people do to kill time at the airport.", answers: [
+    { text: "Use their phone", pts: 35, aliases: ["phone","browse","scroll","social media","text","email","apps","instagram","facebook","tiktok","twitter","iphone","android","cell","mobile","laptop","tablet","computer","internet","netflix","youtube","stream","watch videos"] },
+    { text: "Eat / drink", pts: 26, aliases: ["eat","drink","food","restaurant","bar","coffee","snack","dining","lunch","meal","grab food","diner","hungry","beverage"] },
+    { text: "Read", pts: 18, aliases: ["read","book","magazine","newspaper","reading","novel","kindle","ebook","literature"] },
+    { text: "Sleep / nap", pts: 9, aliases: ["sleep","nap","rest","doze","napping","sleeping","slumber","close eyes"] },
+    { text: "Shop", pts: 7, aliases: ["shop","shopping","buy","store","souvenir","browse stores","duty free","retail"] },
+    { text: "People-watch", pts: 3, aliases: ["people watch","people watching","watch people","observe","stare","look around"] },
+    { text: "Walk around", pts: 2, aliases: ["walk","walking","wander","explore","roam","stretch legs"] },
+  ]},
+  { q: "Name something a burglar would hate to find when breaking into a house.", answers: [
+    { text: "Dog", pts: 52, aliases: ["dog","dogs","puppy","pitbull","guard dog","big dog","pet","barking","bark","pit bull","rottweiler","german shepherd","doberman","rottweiler","watchdog","canine"] },
+    { text: "Alarm / security system", pts: 22, aliases: ["alarm","security","camera","system","sensor","ring","security system","alarm system","motion sensor","cctv","surveillance","security camera","ring doorbell","adt","video","doorbell camera"] },
+    { text: "Person / someone home", pts: 14, aliases: ["person","people","someone home","owner","home","awake","homeowner","resident","family","someone there","occupied","people home","lights on","car in driveway"] },
+    { text: "Gun / weapon", pts: 9, aliases: ["gun","weapon","shotgun","rifle","pistol","armed","firearm","weapons","sword","knife","bat","owner with gun","homeowner armed"] },
+    { text: "Police / cops", pts: 6, aliases: ["police","cop","cops","officer","patrol","detective","law enforcement","sheriff"] },
+    { text: "Neighbor watching", pts: 3, aliases: ["neighbor","neighbour","nosy neighbor","watching","witness","bystander"] },
+    { text: "Lights on", pts: 2, aliases: ["lights","lights on","light","tv on","signs of life","lit up"] },
+    { text: "Big lock / reinforced door", pts: 1, aliases: ["lock","locks","deadbolt","reinforced","bars","steel door","fortified","safe","vault"] },
+  ]},
+  { q: "Name something you might find under a couch cushion.", answers: [
+    { text: "Coins / change", pts: 48, aliases: ["coin","coins","change","money","quarter","dime","penny","cash","dollar","loose change","nickle","nickel","fifty cents"] },
+    { text: "Remote control", pts: 22, aliases: ["remote","remote control","controller","clicker","tv remote","television remote"] },
+    { text: "Food / crumbs", pts: 16, aliases: ["food","crumbs","popcorn","chip","chips","cracker","snack","cookie","crumb","popcorn kernel","cereal","pretzel"] },
+    { text: "Keys", pts: 7, aliases: ["key","keys","car keys","house keys","keychain"] },
+    { text: "Pen / pencil", pts: 4, aliases: ["pen","pencil","marker","crayon","writing","pens","writing utensil"] },
+    { text: "Hair ties / bobby pins", pts: 2, aliases: ["hair tie","bobby pin","hairpin","elastic","rubber band","clip","scrunchie"] },
+    { text: "Socks", pts: 1, aliases: ["sock","socks","stocking","ankle sock"] },
+  ]},
+  { q: "Name something you'd do if you won the lottery.", answers: [
+    { text: "Buy a house", pts: 34, aliases: ["house","home","buy a house","mansion","property","real estate","buy home","condo","villa","estate","purchase home","dream house","new home"] },
+    { text: "Travel / take a vacation", pts: 27, aliases: ["travel","vacation","trip","fly","cruise","abroad","holiday","explore","visit","world tour","travel the world","go on vacation","trip around the world","europe","hawaii","abroad"] },
+    { text: "Pay off debt", pts: 19, aliases: ["pay off","debt","bills","loans","mortgage","credit card","pay debt","student loans","pay bills","debt free","clear debt","pay everything off"] },
+    { text: "Give to family / friends / donate", pts: 10, aliases: ["family","give","donate","charity","help family","kids","parents","friends","share","gift","tithe","church","children","give away","philanthrophy","foundation"] },
+    { text: "Quit my job", pts: 6, aliases: ["quit","quit job","retire","stop working","fire my boss","retire early","leave job","never work again","resign"] },
+    { text: "Buy a car", pts: 3, aliases: ["car","cars","buy a car","vehicle","lambo","ferrari","sports car","luxury car","new car"] },
+    { text: "Invest it", pts: 2, aliases: ["invest","investment","stocks","save","stock market","bonds","portfolio","financial advisor","diversify"] },
+    { text: "Shop / buy clothes", pts: 1, aliases: ["shop","shopping","clothes","wardrobe","designer","shopping spree","gucci","fashion"] },
+  ]},
+  { q: "Name a reason you'd get out of bed in the middle of the night.", answers: [
+    { text: "Use the bathroom / pee", pts: 55, aliases: ["bathroom","toilet","pee","restroom","potty","nature calls","urinate","lavatory","number one","use bathroom","bladder","need to pee","gotta go"] },
+    { text: "Get water / drink something", pts: 20, aliases: ["water","thirsty","drink","get water","drink water","glass of water","cup of water","hydrate","beverage","dehydrated"] },
+    { text: "Hear a noise", pts: 12, aliases: ["noise","sound","loud","bump","hear something","intruder","bang","crash","strange noise","suspicious noise","bump in night"] },
+    { text: "Can't sleep / insomnia", pts: 6, aliases: ["cant sleep","insomnia","restless","toss and turn","awake","wide awake","sleep issues","not tired"] },
+    { text: "Check on kids / baby crying", pts: 5, aliases: ["kids","baby","child","children","crying","baby crying","kid","toddler","infant","newborn","little ones"] },
+    { text: "Hungry / midnight snack", pts: 3, aliases: ["hungry","snack","eat","food","fridge","midnight snack","starving","refrigerator","kitchen","chips","ice cream"] },
+    { text: "Check phone / alarm", pts: 2, aliases: ["phone","alarm","check time","clock","notification","buzz","vibrate"] },
+  ]},
+  { q: "Name something people lie about on their resume.", answers: [
+    { text: "Work experience / job history", pts: 41, aliases: ["experience","job","work","previous job","employment","worked","work history","job history","previous employer","job titles","responsibilities"] },
+    { text: "Education / degree", pts: 28, aliases: ["education","degree","college","school","diploma","university","gpa","graduated","credentials","academic","phd","masters","bachelors","enrolled"] },
+    { text: "Skills / abilities", pts: 17, aliases: ["skill","skills","ability","abilities","computer","languages","bilingual","certifications","qualified","proficient","expert","microsoft office","excel","coding"] },
+    { text: "Job title", pts: 7, aliases: ["title","job title","position","promoted themselves","inflated title","manager","director","ceo"] },
+    { text: "Employment dates / gaps", pts: 5, aliases: ["dates","timeline","years","dates employed","gaps","employment gap","period","duration","overlap","falsified dates"] },
+    { text: "References", pts: 3, aliases: ["reference","references","recommend","recommendation","referral","listed friends","fake references"] },
+    { text: "Salary / pay", pts: 1, aliases: ["salary","pay","wages","income","how much they made","previous salary"] },
+  ]},
+  { q: "Name something that gets harder as you get older.", answers: [
+    { text: "Exercise / staying active", pts: 32, aliases: ["exercise","workout","working out","run","running","sports","gym","physical","athletics","jog","jogging","active","activity","staying fit","fitness"] },
+    { text: "Getting up / out of bed", pts: 25, aliases: ["getting up","out of bed","wake up","rise","standing up","get off floor","get up","stand","rising","getting off couch","floor"] },
+    { text: "Remembering things / memory", pts: 20, aliases: ["remember","memory","forget","recall","remembering","forgetting","memorize","names","brain","memory loss","recall","retention"] },
+    { text: "Reading / eyesight / seeing", pts: 10, aliases: ["read","reading","see","seeing","vision","eyesight","eyes","glasses","focus","blurry","bifocals","contacts"] },
+    { text: "Losing weight", pts: 7, aliases: ["lose weight","losing weight","diet","weight","weight loss","metabolism","shed pounds","slimming","body weight"] },
+    { text: "Climbing stairs", pts: 3, aliases: ["stairs","steps","climbing stairs","knees","climb","going up stairs","steps"] },
+    { text: "Technology", pts: 2, aliases: ["technology","tech","computers","iphone","social media","new tech","gadgets","devices","keeping up"] },
+    { text: "Sleeping well", pts: 1, aliases: ["sleep","sleeping","rest","good sleep","insomnia","sleep through night","nap","deep sleep"] },
+  ]},
+  { q: "Name a food you eat with your hands.", answers: [
+    { text: "Pizza", pts: 36, aliases: ["pizza","slice","pie","pizza slice","pepperoni pizza","cheese pizza"] },
+    { text: "Burger / sandwich", pts: 28, aliases: ["burger","hamburger","sandwich","cheeseburger","sub","hoagie","bun","wrap","grilled cheese","club","hero"] },
+    { text: "Chicken wings", pts: 14, aliases: ["chicken wings","wings","wing","chicken wing","buffalo wings","chicken","drumstick","drumette","lollipop","bbq wings"] },
+    { text: "Hot dog", pts: 9, aliases: ["hot dog","hotdog","frank","wiener","sausage","corn dog","bratwurst"] },
+    { text: "Corn on the cob", pts: 6, aliases: ["corn","corn on the cob","corn cob","cob","maize","elote"] },
+    { text: "Tacos", pts: 4, aliases: ["taco","tacos","burrito","mexican","tortilla"] },
+    { text: "Chips / fries", pts: 2, aliases: ["chips","fries","french fries","crisps","potato chips","doritos","nacho","nachos","cheetos"] },
+    { text: "Fruit", pts: 1, aliases: ["fruit","apple","banana","grapes","strawberry","watermelon","orange","berries","cherry"] },
+  ]},
+  { q: "Name something a cat does that annoys its owner.", answers: [
+    { text: "Scratch furniture", pts: 39, aliases: ["scratch","scratching","claws","claw","shred","ruin furniture","tear","tear up","scratching couch","shred sofa"] },
+    { text: "Meow / make noise", pts: 23, aliases: ["meow","meowing","cry","yowl","loud","noisy","vocalize","whine","noises","sounds","howl","caterwauling","scream"] },
+    { text: "Jump on counters / tables", pts: 17, aliases: ["jump","counter","countertop","table","counters","on table","climb","get on","surfaces","get on counter","jump on table","kitchen counter"] },
+    { text: "Knock things over", pts: 10, aliases: ["knock","knock over","knocking","push off","drop","topple","tips over","push things","break things","knock off shelf"] },
+    { text: "Wake you up at night", pts: 6, aliases: ["wake","wake up","night","sleep","bed","wake you","keep awake","insomnia","sit on face","paw at face","3am"] },
+    { text: "Ignore you", pts: 3, aliases: ["ignore","ignoring","aloof","cold","unfriendly","doesn't care","antisocial","no affection","standoffish"] },
+    { text: "Bring dead animals", pts: 1, aliases: ["dead","animal","mouse","bird","kills","presents","gift","dead mouse","hunt"] },
+  ]},
+  { q: "Name something you check every morning.", answers: [
+    { text: "Phone / notifications", pts: 45, aliases: ["phone","messages","texts","email","social media","notifications","instagram","facebook","twitter","tiktok","apps","cell","iphone","android","whatsapp","snapchat","messages","dms"] },
+    { text: "Weather", pts: 22, aliases: ["weather","forecast","temperature","rain","outside","sky","weather app","weather channel","what to wear","umbrella"] },
+    { text: "Mirror / how you look", pts: 16, aliases: ["mirror","hair","face","look","appearance","outfit","makeup","clothes","how i look","get dressed","reflection"] },
+    { text: "News / headlines", pts: 8, aliases: ["news","headlines","newspaper","cnn","tv","current events","media","world news","morning news","fox news","bbc"] },
+    { text: "Clock / time", pts: 5, aliases: ["alarm","time","clock","watch","time check","how late","what time","snooze","check time","wake up time"] },
+    { text: "Weight / scale", pts: 3, aliases: ["scale","weight","weigh","weigh myself","body weight","pounds"] },
+    { text: "Fridge / food", pts: 1, aliases: ["fridge","food","refrigerator","breakfast","eat","hungry","kitchen","coffee maker"] },
+  ]},
+  { q: "Name something you associate with bees.", answers: [
+    { text: "Honey", pts: 64, aliases: ["honey","honeycomb","bee honey","sweet","hive honey","nectar","golden","syrup","beeswax"] },
+    { text: "Sting / stinger", pts: 18, aliases: ["sting","stinger","stinging","bite","ouch","bee sting","painful","venom","prick","sting you"] },
+    { text: "Hive / colony", pts: 9, aliases: ["hive","beehive","nest","colony","comb","bee hive","swarm","cluster"] },
+    { text: "Flowers / pollen", pts: 5, aliases: ["flower","flowers","pollen","pollinate","garden","nectar","plants","blooms","pollinator"] },
+    { text: "Yellow and black stripes", pts: 3, aliases: ["yellow","black","stripes","yellow and black","color","colour","stripe","striped","yellow black"] },
+    { text: "Buzzing", pts: 2, aliases: ["buzz","buzzing","sound","noise","humming sound","fly","flutter","wings"] },
+    { text: "Queen bee", pts: 1, aliases: ["queen","queen bee","queen bee","royal","leader","bee queen","hive queen"] },
+  ]},
+  { q: "Name something people do to relieve stress.", answers: [
+    { text: "Exercise / work out", pts: 33, aliases: ["exercise","workout","gym","run","running","jog","jogging","yoga","walk","sports","physical activity","fitness","cycling","swim","swimming"] },
+    { text: "Watch TV / movies", pts: 24, aliases: ["tv","television","watch","movies","netflix","streaming","binge","shows","film","video"] },
+    { text: "Listen to music", pts: 18, aliases: ["music","listen","song","songs","playlist","headphones","radio","spotify","podcast"] },
+    { text: "Eat / comfort food", pts: 10, aliases: ["eat","food","comfort food","snack","junk food","binge eat","eating","ice cream","chocolate","stress eat"] },
+    { text: "Meditate / breathe", pts: 6, aliases: ["meditate","meditation","breathe","breathing","deep breath","mindfulness","calm","prayer","pray"] },
+    { text: "Talk to someone / vent", pts: 4, aliases: ["talk","vent","talk to friend","call someone","therapist","therapy","counselor","talk about it","communicate"] },
+    { text: "Sleep / nap", pts: 3, aliases: ["sleep","nap","rest","take a nap","sleeping"] },
+    { text: "Drink alcohol", pts: 1, aliases: ["drink","alcohol","wine","beer","cocktail","glass of wine","bar","have a drink"] },
+  ]},
+  { q: "Name a famous duo.", answers: [
+    { text: "Batman & Robin", pts: 30, aliases: ["batman","robin","batman and robin","dynamic duo","caped crusader","bruce wayne","dick grayson"] },
+    { text: "Tom & Jerry", pts: 25, aliases: ["tom and jerry","tom jerry","tom","jerry","cartoon","cat and mouse","hanna barbera"] },
+    { text: "Peanut butter & jelly", pts: 20, aliases: ["peanut butter","jelly","pbj","pb&j","pb and j","peanut butter and jelly","pbj sandwich","peanut butter jelly"] },
+    { text: "Romeo & Juliet", pts: 12, aliases: ["romeo","juliet","romeo and juliet","shakespeare","star crossed","lovers"] },
+    { text: "Bonnie & Clyde", pts: 8, aliases: ["bonnie","clyde","bonnie and clyde","outlaw","criminals","gangsters"] },
+    { text: "Hall & Oates", pts: 3, aliases: ["hall and oates","hall oates","daryl hall","john oates","music duo"] },
+    { text: "Simon & Garfunkel", pts: 1, aliases: ["simon","garfunkel","simon and garfunkel","paul simon","folk","sounds of silence"] },
+  ]},
+  { q: "Name something you'd find in a kid's backpack.", answers: [
+    { text: "Books / notebooks / binder", pts: 42, aliases: ["book","books","textbook","textbooks","notebook","notebooks","binder","folder","reading","composition book","workbook"] },
+    { text: "Pencils / pens / crayons", pts: 24, aliases: ["pencil","pen","pencils","pens","marker","crayon","crayons","writing utensil","colored pencil","highlighter","eraser","ruler"] },
+    { text: "Lunch / snack", pts: 17, aliases: ["lunch","food","snack","sandwich","lunchbox","snacks","apple","juice","thermos","lunch bag","fruit","granola bar"] },
+    { text: "Phone / tablet", pts: 8, aliases: ["phone","tablet","ipad","device","technology","iphone","android","cell phone","headphones","earbuds"] },
+    { text: "Homework / assignments", pts: 5, aliases: ["homework","assignment","paper","worksheet","project","schoolwork","assignments","notes"] },
+    { text: "Gym clothes / PE uniform", pts: 2, aliases: ["gym","clothes","pe","gym clothes","sports clothes","uniform","change of clothes","athletic wear","sneakers"] },
+    { text: "Water bottle", pts: 1, aliases: ["water","water bottle","bottle","drink","hydro flask","thermos","juice box"] },
+  ]},
+  { q: "Name something you do when you can't sleep.", answers: [
+    { text: "Use your phone / scroll", pts: 38, aliases: ["phone","scroll","social media","browse","instagram","tiktok","facebook","watch videos","youtube","netflix","tablet","text","check phone","apps","online"] },
+    { text: "Watch TV / movies", pts: 24, aliases: ["tv","watch","television","movies","streaming","netflix","show","series","binge","put on tv"] },
+    { text: "Read", pts: 16, aliases: ["read","book","reading","magazine","kindle","novel","literature"] },
+    { text: "Count sheep / think", pts: 8, aliases: ["count sheep","think","counting","daydream","toss and turn","ruminate","lie there","stare","ceiling"] },
+    { text: "Get up / walk around", pts: 5, aliases: ["get up","walk","wander","pace","kitchen","get out of bed","move around"] },
+    { text: "Eat / snack", pts: 4, aliases: ["eat","snack","food","hungry","kitchen","fridge","midnight snack","comfort eating"] },
+    { text: "Listen to music / podcast", pts: 3, aliases: ["music","podcast","listen","sounds","asmr","white noise","radio","audio","sleep sounds"] },
+    { text: "Drink warm milk / tea", pts: 1, aliases: ["milk","warm milk","tea","chamomile","herbal tea","drink","hot drink"] },
+  ]},
+  { q: "Name something you see at every house party.", answers: [
+    { text: "Alcohol / drinks / beer", pts: 43, aliases: ["alcohol","beer","drinks","wine","liquor","cocktails","shots","keg","drink","booze","beverages","cups","solo cup","red cup"] },
+    { text: "Music / dancing", pts: 25, aliases: ["music","dancing","dance","dj","speakers","playlist","loud music","bass","songs","dancing"] },
+    { text: "Food / snacks", pts: 16, aliases: ["food","snacks","chips","dip","pizza","finger food","appetizers","nibbles","munchies","eat"] },
+    { text: "People standing around talking", pts: 8, aliases: ["people","crowd","guests","conversation","talking","socializing","mingling","strangers","groups"] },
+    { text: "Games", pts: 4, aliases: ["games","beer pong","pong","flip cup","card games","party games","jenga","activities"] },
+    { text: "Couples / making out", pts: 3, aliases: ["couples","kissing","making out","romance","pda","hooking up"] },
+    { text: "Someone passed out", pts: 1, aliases: ["passed out","sleeping","drunk","unconscious","floor","couch","knocked out"] },
+  ]},
+  { q: "Name a reason someone would go to the emergency room.", answers: [
+    { text: "Broken bone / fracture", pts: 34, aliases: ["broken","fracture","break","bone","arm","leg","broken arm","broken leg","fractured","snap","crack"] },
+    { text: "Chest pain / heart attack", pts: 27, aliases: ["chest pain","heart attack","heart","cardiac","heart problem","chest","pain in chest","palpitations"] },
+    { text: "Cut / bleeding badly", pts: 17, aliases: ["cut","bleeding","laceration","blood","deep cut","wound","gash","slice","injured","sliced"] },
+    { text: "Car accident / injury", pts: 8, aliases: ["car accident","accident","crash","collision","injury","trauma","wreck","vehicle"] },
+    { text: "Allergic reaction", pts: 6, aliases: ["allergy","allergic","reaction","anaphylaxis","swelling","hives","rash","bee sting","food allergy"] },
+    { text: "Can't breathe / difficulty breathing", pts: 4, aliases: ["breathe","breathing","shortness of breath","asthma","wheeze","cant breathe","difficulty breathing","choking","airway"] },
+    { text: "High fever", pts: 2, aliases: ["fever","high fever","temperature","flu","sick","hot","burning up","105","104"] },
+    { text: "Poisoning / overdose", pts: 1, aliases: ["poison","poisoning","overdose","ods","toxic","swallowed","ingested","drugs"] },
+  ]},
+  { q: "Name something you always find in grandma's house.", answers: [
+    { text: "Hard candy / candy dish", pts: 37, aliases: ["candy","hard candy","candy dish","butterscotch","sweets","peppermint","candy bowl","treats","chocolate","hard candies","werther","werthers"] },
+    { text: "Family photos / pictures", pts: 28, aliases: ["photos","pictures","family photos","photo album","frames","pictures on wall","portraits","memories","photo","wall of photos"] },
+    { text: "Knick knacks / figurines", pts: 16, aliases: ["knick knacks","figurines","collectibles","decorations","tchotchkes","ornaments","ceramics","trinkets","decorative"] },
+    { text: "Doilies / floral patterns", pts: 8, aliases: ["doilies","doily","lace","floral","tablecloth","runner","crochet","floral pattern","floral couch"] },
+    { text: "Old furniture / antiques", pts: 6, aliases: ["old furniture","antiques","antique","old couch","vintage","dated","outdated","wooden furniture","china cabinet"] },
+    { text: "Medications / pill bottles", pts: 3, aliases: ["medicine","medication","pills","pill bottles","prescriptions","vitamins","drugs","bottles"] },
+    { text: "Bible / religious items", pts: 2, aliases: ["bible","church","religion","cross","religious","pray","god","jesus","rosary"] },
+  ]},
+  { q: "Name something that happens at a wedding.", answers: [
+    { text: "First dance", pts: 34, aliases: ["first dance","dance","dancing","slow dance","couples dance","wedding dance","waltz"] },
+    { text: "Cutting the cake", pts: 26, aliases: ["cake","cut the cake","wedding cake","cake cutting","smash cake","eat cake","dessert"] },
+    { text: "Speeches / toasts", pts: 19, aliases: ["speech","toast","speeches","toasts","best man speech","maid of honor","vows","toast to couple","congratulations"] },
+    { text: "Throwing bouquet", pts: 11, aliases: ["bouquet","throw bouquet","bouquet toss","flowers","catch flowers","catching bouquet","tossing flowers"] },
+    { text: "Crying", pts: 6, aliases: ["crying","cry","tears","emotional","weeping","sob","happy tears","moved"] },
+    { text: "Ring exchange", pts: 3, aliases: ["rings","exchange rings","ring","put on ring","vows","wedding bands","jewelry"] },
+    { text: "Flower girl / ring bearer", pts: 1, aliases: ["flower girl","ring bearer","flower","petals","kids","children in wedding"] },
+  ]},
+  { q: "Name something people do to celebrate their birthday.", answers: [
+    { text: "Go out to dinner / restaurant", pts: 39, aliases: ["dinner","restaurant","eat out","go to dinner","celebration dinner","birthday dinner","fancy restaurant","take out","dine out"] },
+    { text: "Have a party / get together", pts: 29, aliases: ["party","birthday party","get together","gathering","celebration","party with friends","celebrate","bash","event","fiesta"] },
+    { text: "Drink / go to a bar", pts: 14, aliases: ["drink","bar","drinks","alcohol","go out","nightclub","club","shots","bar hopping","wine","happy hour"] },
+    { text: "Travel / take a trip", pts: 8, aliases: ["travel","trip","vacation","getaway","birthday trip","staycation","hotel","weekend away","destination"] },
+    { text: "Eat cake / dessert", pts: 5, aliases: ["cake","birthday cake","eat cake","blow out candles","candles","dessert","sweets","ice cream cake"] },
+    { text: "Open presents / gifts", pts: 3, aliases: ["presents","gifts","open gifts","birthday gifts","unwrap","surprises"] },
+    { text: "Stay home / relax", pts: 1, aliases: ["stay home","relax","quiet","chill","do nothing","low key","netflix","sleep","peaceful"] },
+  ]},
+];
+
+const EMOJIS = ["🦁","🐯","🐻","🦊","🐺","🦅","🐬","🐉","🌟","🔥","⚡","🏆","💎","🎯","👑","🚀","🎸","🌈","🦋","🍕"];
+
+// ─── Sounds ──────────────────────────────────────────────────────────────────
+function playSound(type) {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+
+    if (type === 'ding') {
+      // Bright ascending bell chord — real FF correct answer chime
+      [1046, 1318, 1568, 2093].forEach((freq, i) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain); gain.connect(ctx.destination);
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, ctx.currentTime + i * 0.03);
+        gain.gain.setValueAtTime(0, ctx.currentTime + i * 0.03);
+        gain.gain.linearRampToValueAtTime(0.28, ctx.currentTime + i * 0.03 + 0.01);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i * 0.03 + 0.6);
+        osc.start(ctx.currentTime + i * 0.03);
+        osc.stop(ctx.currentTime + i * 0.03 + 0.7);
+      });
+      // Punchy attack click
+      const click = ctx.createOscillator();
+      const clickGain = ctx.createGain();
+      click.connect(clickGain); clickGain.connect(ctx.destination);
+      click.type = 'triangle';
+      click.frequency.setValueAtTime(2400, ctx.currentTime);
+      click.frequency.exponentialRampToValueAtTime(400, ctx.currentTime + 0.05);
+      clickGain.gain.setValueAtTime(0.4, ctx.currentTime);
+      clickGain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.08);
+      click.start(ctx.currentTime); click.stop(ctx.currentTime + 0.1);
+
+    } else if (type === 'buzz') {
+      // Harsh "EHHHHH" — layered detuned sawtooth with heavy distortion
+      const makeCurve = (amount) => {
+        const curve = new Float32Array(512);
+        for (let i = 0; i < 512; i++) {
+          const x = (i * 2) / 512 - 1;
+          curve[i] = ((Math.PI + amount) * x) / (Math.PI + amount * Math.abs(x));
+        }
+        return curve;
+      };
+      [[150, 0], [157, 0.02], [143, 0.04], [75, 0.01]].forEach(([freq, delay]) => {
+        const osc = ctx.createOscillator();
+        const shaper = ctx.createWaveShaper();
+        const gain = ctx.createGain();
+        shaper.curve = makeCurve(400);
+        osc.type = 'sawtooth';
+        osc.connect(shaper); shaper.connect(gain); gain.connect(ctx.destination);
+        osc.frequency.setValueAtTime(freq, ctx.currentTime + delay);
+        osc.frequency.linearRampToValueAtTime(freq * 0.85, ctx.currentTime + delay + 1.1);
+        gain.gain.setValueAtTime(0, ctx.currentTime + delay);
+        gain.gain.linearRampToValueAtTime(0.28, ctx.currentTime + delay + 0.02);
+        gain.gain.setValueAtTime(0.28, ctx.currentTime + delay + 0.85);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + delay + 1.2);
+        osc.start(ctx.currentTime + delay);
+        osc.stop(ctx.currentTime + delay + 1.3);
+      });
+
+    } else if (type === 'celebrate') {
+      // Triumphant ascending fanfare — like FF fast money win music
+      [[523,0],[659,0],[784,0],[1047,0.05],[784,0.15],[1047,0.2],[1319,0.25],[1047,0.35],[1319,0.4],[1568,0.45]].forEach(([freq, t]) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain); gain.connect(ctx.destination);
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(freq, ctx.currentTime + t);
+        gain.gain.setValueAtTime(0, ctx.currentTime + t);
+        gain.gain.linearRampToValueAtTime(0.18, ctx.currentTime + t + 0.01);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + t + 0.25);
+        osc.start(ctx.currentTime + t); osc.stop(ctx.currentTime + t + 0.3);
+      });
+      const bass = ctx.createOscillator();
+      const bassGain = ctx.createGain();
+      bass.connect(bassGain); bassGain.connect(ctx.destination);
+      bass.type = 'sine';
+      bass.frequency.setValueAtTime(130, ctx.currentTime);
+      bass.frequency.exponentialRampToValueAtTime(65, ctx.currentTime + 0.3);
+      bassGain.gain.setValueAtTime(0.4, ctx.currentTime);
+      bassGain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4);
+      bass.start(ctx.currentTime); bass.stop(ctx.currentTime + 0.5);
+
+    } else if (type === 'reveal') {
+      // Snappy whoosh-click tile flip sound
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(300, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(900, ctx.currentTime + 0.06);
+      gain.gain.setValueAtTime(0.3, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.12);
+      osc.start(ctx.currentTime); osc.stop(ctx.currentTime + 0.15);
+      const click = ctx.createOscillator();
+      const clickGain = ctx.createGain();
+      click.connect(clickGain); clickGain.connect(ctx.destination);
+      click.type = 'square';
+      click.frequency.setValueAtTime(1200, ctx.currentTime + 0.06);
+      clickGain.gain.setValueAtTime(0.15, ctx.currentTime + 0.06);
+      clickGain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.13);
+      click.start(ctx.currentTime + 0.06); click.stop(ctx.currentTime + 0.15);
+
+    } else if (type === 'tick') {
+      // Soft metronome tick — quiet, just present enough to feel the clock
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(880, ctx.currentTime);
+      gain.gain.setValueAtTime(0, ctx.currentTime);
+      gain.gain.linearRampToValueAtTime(0.07, ctx.currentTime + 0.005);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.07);
+      osc.start(ctx.currentTime); osc.stop(ctx.currentTime + 0.08);
+
+    } else if (type === 'countdown') {
+      // Urgent double-beep for 5-4-3-2-1 — sharp, loud, insistent
+      [0, 0.13].forEach(delay => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain); gain.connect(ctx.destination);
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(1400, ctx.currentTime + delay);
+        gain.gain.setValueAtTime(0, ctx.currentTime + delay);
+        gain.gain.linearRampToValueAtTime(0.25, ctx.currentTime + delay + 0.008);
+        gain.gain.setValueAtTime(0.25, ctx.currentTime + delay + 0.08);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + delay + 0.12);
+        osc.start(ctx.currentTime + delay); osc.stop(ctx.currentTime + delay + 0.14);
+        // Harmonic layer
+        const osc2 = ctx.createOscillator();
+        const gain2 = ctx.createGain();
+        osc2.connect(gain2); gain2.connect(ctx.destination);
+        osc2.type = 'sine';
+        osc2.frequency.setValueAtTime(2800, ctx.currentTime + delay);
+        gain2.gain.setValueAtTime(0.1, ctx.currentTime + delay);
+        gain2.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + delay + 0.1);
+        osc2.start(ctx.currentTime + delay); osc2.stop(ctx.currentTime + delay + 0.12);
+      });
+
+    } else if (type === 'timerEnd') {
+      // Time's up! — three rapid descending klaxon blasts
+      const makeCurve = (amount) => {
+        const curve = new Float32Array(512);
+        for (let i = 0; i < 512; i++) {
+          const x = (i * 2) / 512 - 1;
+          curve[i] = ((Math.PI + amount) * x) / (Math.PI + amount * Math.abs(x));
+        }
+        return curve;
+      };
+      [0, 0.28, 0.56].forEach(delay => {
+        const osc = ctx.createOscillator();
+        const shaper = ctx.createWaveShaper();
+        const gain = ctx.createGain();
+        shaper.curve = makeCurve(200);
+        osc.type = 'sawtooth';
+        osc.connect(shaper); shaper.connect(gain); gain.connect(ctx.destination);
+        osc.frequency.setValueAtTime(440, ctx.currentTime + delay);
+        osc.frequency.linearRampToValueAtTime(220, ctx.currentTime + delay + 0.22);
+        gain.gain.setValueAtTime(0, ctx.currentTime + delay);
+        gain.gain.linearRampToValueAtTime(0.35, ctx.currentTime + delay + 0.01);
+        gain.gain.setValueAtTime(0.35, ctx.currentTime + delay + 0.18);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + delay + 0.25);
+        osc.start(ctx.currentTime + delay); osc.stop(ctx.currentTime + delay + 0.28);
+      });
+    }
+  } catch(e) {}
+}
+
+
+// ─── App ─────────────────────────────────────────────────────────────────────
+function App() {
+  const [screen, setScreen] = useState('lobby'); // lobby | host | teamA | teamB | fastmoney | final
+  const [teams, setTeams] = useState([
+    { name: 'Team A', emoji: '🦁', score: 0 },
+    { name: 'Team B', emoji: '🐯', score: 0 },
+  ]);
+  const [rounds, setRounds] = useState([
+    { question: 'Name something you find in a kitchen.', answers: [
+      { text: 'Refrigerator', pts: 42 }, { text: 'Stove', pts: 30 },
+      { text: 'Sink', pts: 18 }, { text: 'Microwave', pts: 10 }
+    ]},
+    { question: 'Name something people do on vacation.', answers: [
+      { text: 'Swimming', pts: 38 }, { text: 'Sightseeing', pts: 25 },
+      { text: 'Shopping', pts: 22 }, { text: 'Relaxing', pts: 15 }
+    ]},
+    { question: 'Name a popular pet.', answers: [
+      { text: 'Dog', pts: 50 }, { text: 'Cat', pts: 32 },
+      { text: 'Fish', pts: 12 }, { text: 'Bird', pts: 6 }
+    ]},
+  ]);
+  const [gameState, setGameState] = useState({
+    roundIdx: 0,
+    phase: 'faceoff', // faceoff | play | steal | roundend
+    controlTeam: 0,
+    stealTeam: null,
+    strikes: 0,
+    revealed: [],
+    roundPts: 0,
+    buzzer: null,
+  });
+  const [fmState, setFmState] = useState(null);
+  const [toast, setToast] = useState(null);
+
+  const showToast = useCallback((msg, dur=2500) => {
+    setToast(msg);
+    setTimeout(() => setToast(null), dur);
+  }, []);
+
+  // Detect if this is a player phone joining via URL param
+  const urlParams = new URLSearchParams(window.location.search);
+  const joinTeam = urlParams.get('team');
+  if (joinTeam === 'A' || joinTeam === 'B') {
+    return <JoinScreen teamParam={joinTeam} />;
+  }
+
+  function startGame() {
+    setScreen('host');
+    setGameState({
+      roundIdx: 0, phase: 'faceoff', controlTeam: 0,
+      stealTeam: null, strikes: 0, revealed: [], roundPts: 0, buzzer: null,
+    });
+  }
+
+  const currentRound = rounds[gameState.roundIdx] || rounds[0];
+
+  function handleReveal(idx) {
+    if (gameState.revealed.includes(idx)) return;
+    const ans = currentRound.answers[idx];
+    const addPts = ans.pts;
+    playSound('ding');
+
+    if (gameState.phase === 'faceoff-reveal') {
+      // Buzzer team answered correctly — record their pts, now other team gets a turn
+      const otherTeam = gameState.buzzer === 0 ? 1 : 0;
+      const newFaceoffPts = [0, 0];
+      newFaceoffPts[gameState.buzzer] = addPts;
+      showToast(`${teams[gameState.buzzer].name} got ${addPts} pts! Now ${teams[otherTeam].name} answers...`);
+      setGameState(g => ({
+        ...g,
+        revealed: [...g.revealed, idx],
+        faceoffPts: newFaceoffPts,
+        phase: 'faceoff-reveal-2',
+      }));
+      return;
+    }
+
+    if (gameState.phase === 'faceoff-reveal-2') {
+      // Other team answered — record their pts, now compare and go to play/pass
+      const otherTeam = gameState.buzzer === 0 ? 1 : 0;
+      const newFaceoffPts = [...(gameState.faceoffPts || [0,0])];
+      newFaceoffPts[otherTeam] = addPts;
+      setGameState(g => ({
+        ...g,
+        revealed: [...g.revealed, idx],
+        faceoffPts: newFaceoffPts,
+        phase: 'faceoff-award',
+      }));
+      return;
+    }
+
+    if (gameState.phase === 'steal') {
+      const totalTransfer = gameState.roundPts + addPts;
+      const stTeam = gameState.stealTeam;
+      setTeams(ts => ts.map((team,i) => {
+        if (i === stTeam) return {...team, score: team.score + totalTransfer};
+        if (i === gameState.controlTeam) return {...team, score: team.score - gameState.roundPts};
+        return team;
+      }));
+      showToast(`${teams[stTeam].name} STEALS ${totalTransfer} POINTS! 🎉`, 3000);
+      playSound('celebrate');
+      setGameState(g => ({
+        ...g,
+        revealed: currentRound.answers.map((_, i) => i),
+        roundPts: totalTransfer,
+        phase: 'roundend',
+      }));
+      setTimeout(() => advanceRound(), 3000);
+    } else {
+      setTeams(ts => ts.map((team,i) => i===gameState.controlTeam ? {...team, score: team.score + addPts} : team));
+      setGameState(s => ({ ...s, revealed: [...s.revealed, idx], roundPts: s.roundPts + addPts }));
+    }
+  }
+
+  function handleFaceoffWrong() {
+    playSound('buzz');
+    if (gameState.phase === 'faceoff-reveal') {
+      // Buzzer got it wrong (0 pts) — other team still gets their turn
+      const otherTeam = gameState.buzzer === 0 ? 1 : 0;
+      const newFaceoffPts = [0, 0]; // buzzer scored 0
+      showToast(`${teams[gameState.buzzer].name} wrong! ${teams[otherTeam].name} gets a chance!`);
+      setGameState(g => ({ ...g, faceoffPts: newFaceoffPts, phase: 'faceoff-reveal-2', faceoffWrongTeam: g.buzzer }));
+    } else if (gameState.phase === 'faceoff-reveal-2') {
+      // Other team also wrong — both have 0, still go to award (host picks)
+      const newFaceoffPts = [...(gameState.faceoffPts || [0,0])];
+      const otherTeam = gameState.buzzer === 0 ? 1 : 0;
+      newFaceoffPts[otherTeam] = 0;
+      showToast('Both teams wrong! Host awards control.', 2500);
+      setGameState(g => ({ ...g, faceoffPts: newFaceoffPts, phase: 'faceoff-award' }));
+    }
+  }
+
+  function faceoffPlayOrPass(controlTeam, playTeam) {
+    const fp = gameState.faceoffPts || [0, 0];
+    const totalPts = fp[0] + fp[1];
+    if (totalPts > 0) {
+      // Points always go to whichever team plays the round
+      setTeams(ts => ts.map((team,i) => i===playTeam ? {...team, score: team.score + totalPts} : team));
+    }
+    setGameState(g => ({ ...g, controlTeam: playTeam, roundPts: totalPts, phase: 'play', buzzer: null, faceoffPts: null, faceoffWrongTeam: null }));
+    showToast(`${teams[playTeam].name} plays the round!`);
+  }
+
+  function advanceRound() {
+    setGameState(g => {
+      if (g.roundIdx + 1 >= rounds.length) {
+        return g; // Will call startFastMoney separately
+      }
+      return {
+        ...g,
+        roundIdx: g.roundIdx + 1,
+        phase: 'faceoff',
+        strikes: 0,
+        revealed: [],
+        roundPts: 0,
+        buzzer: null,
+        stealTeam: null,
+      };
+    });
+    // Check if we need fast money
+    if (gameState.roundIdx + 1 >= rounds.length) {
+      startFastMoney();
+    } else {
+      showToast('Next Round!', 1500);
+    }
+  }
+
+  function handleStrike() {
+    playSound('buzz');
+    const s = gameState.strikes + 1;
+    setGameState(g => ({ ...g, strikes: s }));
+    if (s >= 3) {
+      // Auto-assign steal to opposite team
+      const stealTeamIdx = gameState.controlTeam === 0 ? 1 : 0;
+      showToast(`3 STRIKES! ${teams[stealTeamIdx].name} gets the STEAL!`, 3000);
+      setTimeout(() => {
+        setGameState(g => ({ ...g, phase: 'steal', stealTeam: stealTeamIdx, strikes: 0 }));
+      }, 500);
+    }
+  }
+
+  function triggerSteal(teamIdx) {
+    setGameState(g => ({ ...g, phase: 'steal', stealTeam: teamIdx, strikes: 0 }));
+    showToast(`${teams[teamIdx].name} gets the steal!`);
+  }
+
+  function handleStealCorrect() {
+    const stTeam = gameState.stealTeam;
+    const ptsToTransfer = gameState.roundPts;
+    setTeams(ts => ts.map((team,i) => {
+      if (i === stTeam) return {...team, score: team.score + ptsToTransfer};
+      if (i === gameState.controlTeam) return {...team, score: team.score - ptsToTransfer};
+      return team;
+    }));
+    showToast(`${teams[stTeam].name} STEALS ${ptsToTransfer} POINTS! 🎉`, 3000);
+    playSound('celebrate');
+    endRound();
+  }
+
+  function handleStealWrong() {
+    playSound('buzz');
+    showToast(`Steal missed! ${teams[gameState.controlTeam].name} keeps ${gameState.roundPts} points.`, 3000);
+    endRound();
+  }
+
+  function endRound() {
+    setGameState(g => ({
+      ...g,
+      revealed: currentRound.answers.map((_, i) => i),
+      phase: 'roundend',
+    }));
+    setTimeout(() => advanceRound(), 2500);
+  }
+
+  function simulateBuzz(teamIdx) {
+    playSound('reveal');
+    setGameState(g => ({ ...g, buzzer: teamIdx, phase: 'faceoff-reveal' }));
+    showToast(`${teams[teamIdx].name} buzzed in! Click their answer on the board.`);
+  }
+
+  function selectControlTeam(teamIdx) {
+    setGameState(g => ({ ...g, controlTeam: teamIdx, phase: 'play', buzzer: null }));
+    showToast(`${teams[teamIdx].name} takes control!`);
+  }
+
+  function startFastMoney() {
+    // Both players answer the SAME 6 questions
+    const shuffled = [...FM_QUESTIONS_POOL].sort(() => Math.random() - 0.5);
+    const qs = shuffled.slice(0, 6);
+    setFmState({
+      phase: 1,
+      p1qs: qs,
+      p2qs: qs, // same questions for both
+      p1answers: Array(6).fill(''),
+      p2answers: Array(6).fill(''),
+      p1pts: Array(6).fill(0),
+      p2pts: Array(6).fill(0),
+      timer: 30,
+      timerActive: false,
+      activeQ: 0,
+    });
+    setScreen('fastmoney');
+  }
+
+  function lookupFmPts(answer, qObj) {
+    if (!answer.trim()) return 0;
+    const inp = answer.trim().toLowerCase().replace(/[^a-z0-9 ]/g, '').trim();
+    if (!inp) return 0;
+    let best = 0;
+    for (const a of qObj.answers) {
+      // Check against every alias
+      const aliases = a.aliases || [a.text];
+      for (const alias of aliases) {
+        const al = alias.toLowerCase().replace(/[^a-z0-9 ]/g, '').trim();
+        if (!al) continue;
+        // Exact
+        if (al === inp) { best = Math.max(best, a.pts); break; }
+        // One contains the other (handles "chicken wings" when user types "wings" or vice versa)
+        if (al.includes(inp) || inp.includes(al)) { best = Math.max(best, a.pts); break; }
+      }
+    }
+    return best;
+  }
+
+  function updateFmAnswer(player, qIdx, val) {
+    setFmState(s => {
+      const key = player === 1 ? 'p1answers' : 'p2answers';
+      const ptsKey = player === 1 ? 'p1pts' : 'p2pts';
+      const qs = player === 1 ? s.p1qs : s.p2qs;
+      const newAnswers = [...s[key]]; newAnswers[qIdx] = val;
+      const newPts = [...s[ptsKey]]; newPts[qIdx] = lookupFmPts(val, qs[qIdx]);
+      return { ...s, [key]: newAnswers, [ptsKey]: newPts };
+    });
+  }
+
+  function finalizeFastMoney() {
+    if (!fmState) return;
+    const totalPts = [...fmState.p1pts, ...fmState.p2pts].reduce((a,b)=>a+b,0);
+    const winTeam = gameState.controlTeam;
+    setTeams(ts => ts.map((t,i) => i===winTeam ? {...t, score: t.score+totalPts} : t));
+    playSound('celebrate');
+    setScreen('final');
+  }
+
+  if (screen === 'lobby') {
+    return <LobbyScreen teams={teams} setTeams={setTeams} rounds={rounds} setRounds={setRounds} onStart={startGame} />;
+  }
+  if (screen === 'teamA') {
+    return <TeamPhoneScreen teamIdx={0} teams={teams} round={currentRound} gameState={gameState} onBuzz={simulateBuzz} onBack={()=>setScreen('host')} />;
+  }
+  if (screen === 'teamB') {
+    return <TeamPhoneScreen teamIdx={1} teams={teams} round={currentRound} gameState={gameState} onBuzz={simulateBuzz} onBack={()=>setScreen('host')} />;
+  }
+  if (screen === 'fastmoney') {
+    return <FastMoneyScreen fmState={fmState} setFmState={setFmState} teams={teams} gameState={gameState} updateFmAnswer={updateFmAnswer} onFinish={finalizeFastMoney} onBack={()=>setScreen('host')} />;
+  }
+  if (screen === 'final') {
+    return <FinalScreen teams={teams} onRestart={()=>{ setScreen('lobby'); setTeams([{name:'Team A',emoji:'🦁',score:0},{name:'Team B',emoji:'🐯',score:0}]); }} />;
+  }
+
+  // HOST / MAIN SCREEN
+  return (
+    <div className="game-screen">
+      {toast && <div className="toast">{toast}</div>}
+
+      {/* Scores bar */}
+      <div className="scores-bar">
+        <div className="team-score-block">
+          <div className="team-score-name">{teams[0].emoji} {teams[0].name}</div>
+          <div className={`team-score-pts${gameState.controlTeam===0?' active':''}`}>{teams[0].score}</div>
+        </div>
+        <div style={{textAlign:'center'}}>
+          <div className="game-logo">FAMILY FEUD</div>
+          <div style={{fontSize:'0.7rem',color:'var(--silver)',letterSpacing:'2px'}}>Round {gameState.roundIdx+1} / {rounds.length}</div>
+          <div style={{display:'flex',gap:8,justifyContent:'center',marginTop:6}}>
+            <button className="hc-btn" style={{fontSize:'0.75rem',padding:'4px 10px'}} onClick={()=>setScreen('teamA')}>📱 Team A</button>
+            <button className="hc-btn" style={{fontSize:'0.75rem',padding:'4px 10px'}} onClick={()=>setScreen('teamB')}>📱 Team B</button>
+          </div>
+        </div>
+        <div className="team-score-block" style={{textAlign:'right'}}>
+          <div className="team-score-name">{teams[1].name} {teams[1].emoji}</div>
+          <div className={`team-score-pts${gameState.controlTeam===1?' active':''}`}>{teams[1].score}</div>
+        </div>
+      </div>
+
+      <div className="center-area">
+        <div className="phase-label">
+          {gameState.phase==='faceoff' ? 'FACE-OFF'
+          : gameState.phase==='faceoff-reveal' ? `FACE-OFF — ${teams[gameState.buzzer??0].name.toUpperCase()} ANSWERS FIRST`
+          : gameState.phase==='faceoff-reveal-2' ? `FACE-OFF — ${teams[gameState.buzzer===0?1:0].name.toUpperCase()} NOW ANSWERS`
+          : gameState.phase==='faceoff-award' ? (()=>{ const fp=gameState.faceoffPts||[0,0]; const w=fp[0]>=fp[1]?0:1; return fp[0]===fp[1]?'FACE-OFF — TIE! HOST PICKS':`FACE-OFF — ${teams[w].name.toUpperCase()} WINS! PLAY OR PASS?`; })()
+          : gameState.phase==='play' ? 'MAIN ROUND'
+          : gameState.phase==='steal' ? 'STEAL OPPORTUNITY!'
+          : 'ROUND END'}
+        </div>
+
+        {gameState.buzzer !== null && (gameState.phase === 'faceoff-reveal' || gameState.phase === 'faceoff-reveal-2' || gameState.phase === 'faceoff-award') && (
+          <div className="buzz-display">⚡ {teams[gameState.buzzer].emoji} {teams[gameState.buzzer].name} BUZZED IN!</div>
+        )}
+
+        <div className="question-box">{currentRound.question}</div>
+
+        {/* Strikes */}
+        <div className="strikes-row">
+          <span style={{fontSize:'0.8rem',color:'var(--silver)',letterSpacing:'2px',marginRight:4}}>STRIKES:</span>
+          {[0,1,2].map(i=>(
+            <span key={i} className={`strike-x${gameState.strikes>i?' active':''}`}>✕</span>
+          ))}
+          <span style={{marginLeft:12,fontSize:'0.85rem',color:'var(--gold)'}}>Round Pts: <b>{gameState.roundPts}</b></span>
+        </div>
+
+        {/* Answers grid */}
+        <div className="answers-grid">
+          {currentRound.answers.map((ans, i) => (
+            <div
+              key={i}
+              className={`answer-tile${gameState.revealed.includes(i)?' revealed':''}${(gameState.phase==='faceoff-reveal'||gameState.phase==='faceoff-reveal-2')&&!gameState.revealed.includes(i)?' clickable-faceoff':''}`}
+              onClick={() => (gameState.phase === 'faceoff-reveal' || gameState.phase === 'faceoff-reveal-2' || gameState.phase === 'play' || gameState.phase === 'steal') && handleReveal(i)}
+            >
+              <span className="rank">{i+1}</span>
+              <span className="ans-text">{ans.text}</span>
+              <span className="ans-pts">{ans.pts}</span>
+            </div>
+          ))}
+        </div>
+
+        {/* Host Controls */}
+        <div className="host-controls">
+          <h4>🎬 HOST CONTROLS</h4>
+          <div className="hc-row" style={{marginBottom:10}}>
+            {/* Face-Off Phase — waiting for buzz */}
+            {gameState.phase === 'faceoff' && (<>
+              <span style={{color:'var(--silver)',fontSize:'0.8rem',letterSpacing:'1px'}}>Simulate buzz:</span>
+              {teams.map((t,i)=>(
+                <button key={i} className="hc-btn gold" onClick={()=>simulateBuzz(i)}>{t.emoji} {t.name} Buzz</button>
+              ))}
+            </>)}
+
+            {/* Face-Off — buzzer team answers first */}
+            {gameState.phase === 'faceoff-reveal' && (<>
+              <span style={{color:'var(--gold)',fontSize:'0.85rem',fontFamily:'Anton',letterSpacing:'1px'}}>
+                {teams[gameState.buzzer??0].emoji} {teams[gameState.buzzer??0].name} answers first:
+              </span>
+              <span style={{color:'rgba(245,197,24,0.8)',fontSize:'0.8rem',background:'rgba(245,197,24,0.1)',padding:'5px 10px',borderRadius:4,border:'1px solid rgba(245,197,24,0.3)'}}>
+                👆 Click the tile if on the board
+              </span>
+              <button className="hc-btn red" onClick={handleFaceoffWrong}>❌ Not on the board</button>
+            </>)}
+
+            {/* Face-Off — other team gets their chance regardless */}
+            {gameState.phase === 'faceoff-reveal-2' && (()=>{
+              const otherTeam = gameState.buzzer===0?1:0;
+              const fp = gameState.faceoffPts||[0,0];
+              return (<>
+                <span style={{color:'var(--gold)',fontSize:'0.85rem',fontFamily:'Anton',letterSpacing:'1px'}}>
+                  {teams[otherTeam].emoji} {teams[otherTeam].name} answers:
+                </span>
+                {fp[gameState.buzzer] > 0 && (
+                  <span style={{fontSize:'0.8rem',color:'var(--silver)',background:'rgba(255,255,255,0.06)',padding:'4px 10px',borderRadius:4}}>
+                    {teams[gameState.buzzer].name}: {fp[gameState.buzzer]} pts
+                  </span>
+                )}
+                <span style={{color:'rgba(245,197,24,0.8)',fontSize:'0.8rem',background:'rgba(245,197,24,0.1)',padding:'5px 10px',borderRadius:4,border:'1px solid rgba(245,197,24,0.3)'}}>
+                  👆 Click the tile if on the board
+                </span>
+                <button className="hc-btn red" onClick={handleFaceoffWrong}>❌ Not on the board</button>
+              </>);
+            })()}
+
+            {/* Face-Off — both answered, winner chooses play or pass */}
+            {gameState.phase === 'faceoff-award' && (()=>{
+              const fp = gameState.faceoffPts||[0,0];
+              const winnerIdx = fp[0] >= fp[1] ? 0 : 1;
+              const loserIdx = winnerIdx === 0 ? 1 : 0;
+              const tied = fp[0] === fp[1];
+              return (<>
+                <div style={{width:'100%',marginBottom:6}}>
+                  <div style={{display:'flex',gap:10,marginBottom:8,flexWrap:'wrap',alignItems:'center'}}>
+                    <span style={{fontSize:'0.85rem',color:'var(--gold)',fontFamily:'Anton',letterSpacing:'1px'}}>
+                      {tied ? 'TIE — HOST PICKS:' : `${teams[winnerIdx].emoji} ${teams[winnerIdx].name} wins faceoff (${fp[winnerIdx]} vs ${fp[loserIdx]} pts) — they choose:`}
+                    </span>
+                  </div>
+                  <div style={{display:'flex',gap:10,flexWrap:'wrap'}}>
+                    {tied ? (
+                      teams.map((t,i) => (
+                        <button key={i} className="hc-btn green" style={{fontSize:'0.95rem',padding:'10px 18px'}} onClick={()=>faceoffPlayOrPass(i,i)}>
+                          {t.emoji} {t.name} Plays
+                        </button>
+                      ))
+                    ) : (<>
+                      <button className="hc-btn green" style={{fontSize:'0.95rem',padding:'10px 18px'}} onClick={()=>faceoffPlayOrPass(winnerIdx, winnerIdx)}>
+                        ✅ {teams[winnerIdx].name} Plays
+                      </button>
+                      <button className="hc-btn gold" style={{fontSize:'0.95rem',padding:'10px 18px'}} onClick={()=>faceoffPlayOrPass(winnerIdx, loserIdx)}>
+                        🔄 {teams[winnerIdx].name} Passes to {teams[loserIdx].name}
+                      </button>
+                    </>)}
+                    <button className="hc-btn" onClick={()=>setGameState(g=>({...g, phase:'faceoff-reveal-2'}))}>← Back</button>
+                  </div>
+                </div>
+              </>);
+            })()}
+
+            {/* Play Phase */}
+            {(gameState.phase === 'play' || gameState.phase === 'steal') && (<>
+              <span style={{color:'var(--silver)',fontSize:'0.8rem',letterSpacing:'1px'}}>
+                {gameState.phase==='steal'
+                  ? `🚨 ${teams[gameState.stealTeam??0].emoji} ${teams[gameState.stealTeam??0].name} is STEALING:`
+                  : `${teams[gameState.controlTeam].emoji} ${teams[gameState.controlTeam].name} playing:`}
+              </span>
+              {gameState.phase === 'play' && (
+                <button className="hc-btn red" onClick={handleStrike}>❌ Wrong / Strike</button>
+              )}
+              {gameState.phase === 'steal' && (<>
+                <span style={{color:'rgba(245,197,24,0.8)',fontSize:'0.8rem',background:'rgba(245,197,24,0.1)',padding:'5px 10px',borderRadius:4,border:'1px solid rgba(245,197,24,0.3)'}}>
+                  ✅ Click an answer tile if correct
+                </span>
+                <button className="hc-btn red" onClick={handleStealWrong}>❌ Wrong — {teams[gameState.controlTeam].name} keeps pts</button>
+              </>)}
+              <button className="hc-btn" onClick={endRound}>⏭ End Round</button>
+            </>)}
+            {/* Manual steal trigger */}
+            {gameState.phase === 'play' && gameState.strikes < 3 && (
+              <button className="hc-btn" onClick={()=>triggerSteal(gameState.controlTeam===0?1:0)}>🚨 Manual Steal</button>
+            )}
+          </div>
+          <div className="hc-row">
+            <button className="hc-btn" onClick={()=>setScreen('lobby')}>🏠 Lobby</button>
+            <button className="hc-btn" onClick={startFastMoney}>⚡ Skip to Fast Money</button>
+            <span style={{color:'var(--silver)',fontSize:'0.75rem',marginLeft:8}}>Click answer tiles above to reveal them</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── Join Screen (phone view via URL param) ───────────────────────────────────
+function JoinScreen({ teamParam }) {
+  const teamIdx = teamParam === 'A' ? 0 : 1;
+  const teamColors = ['#f5c518', '#4a9eff'];
+  const teamNames = ['Team A', 'Team B'];
+  const teamEmojis = ['🦁', '🐯'];
+  const color = teamColors[teamIdx];
+  const [buzzed, setBuzzed] = useState(false);
+  const [buzzing, setBuzzing] = useState(false);
+
+  function handleBuzz() {
+    if (buzzed || buzzing) return;
+    setBuzzing(true);
+    playSound('reveal');
+    setTimeout(() => { setBuzzed(true); setBuzzing(false); }, 300);
+  }
+
+  return (
+    <div className="join-screen">
+      <div style={{fontSize:'4rem',marginBottom:8}}>{teamEmojis[teamIdx]}</div>
+      <div style={{fontFamily:'Anton',fontSize:'2.2rem',color,letterSpacing:'3px',marginBottom:4}}>{teamNames[teamIdx]}</div>
+      <div style={{fontSize:'0.75rem',color:'var(--silver)',letterSpacing:'3px',marginBottom:40,textTransform:'uppercase'}}>Family Feud</div>
+      <button onClick={handleBuzz} disabled={buzzed} style={{width:200,height:200,borderRadius:'50%',background:buzzed?'radial-gradient(circle, #1a8a2a, #0a4a15)':buzzing?'radial-gradient(circle, #ff6600, #aa3300)':`radial-gradient(circle, ${color}, ${teamIdx===0?'#8a6a00':'#1a5aaa'})`,border:`6px solid ${buzzed?'rgba(90,255,90,0.5)':'rgba(255,255,255,0.2)'}`,color:buzzed?'#fff':'#000',fontFamily:'Anton',fontSize:buzzed?'1.2rem':'2.2rem',letterSpacing:'3px',cursor:buzzed?'default':'pointer',boxShadow:buzzed?'0 0 60px rgba(26,138,42,0.8)':`0 0 40px ${color}88`,transition:'all 0.15s',textTransform:'uppercase',transform:buzzing?'scale(0.94)':'scale(1)'}}>
+        {buzzed ? '✓ BUZZED!' : 'BUZZ!'}
+      </button>
+      {buzzed && (
+        <div style={{marginTop:28,textAlign:'center'}}>
+          <div style={{fontFamily:'Anton',fontSize:'1.1rem',color:'#7fff7f',letterSpacing:'2px',marginBottom:12}}>⚡ You buzzed in! Speak your answer.</div>
+          <button onClick={()=>setBuzzed(false)} style={{background:'rgba(255,255,255,0.08)',border:'1px solid rgba(255,255,255,0.2)',borderRadius:8,color:'var(--silver)',fontFamily:'Oswald',fontSize:'0.9rem',padding:'10px 24px',cursor:'pointer',letterSpacing:'1px'}}>↺ Reset for next round</button>
+        </div>
+      )}
+      {!buzzed && <div style={{marginTop:28,fontSize:'0.8rem',color:'rgba(255,255,255,0.35)',textAlign:'center',maxWidth:260,lineHeight:1.6}}>Tap as fast as you can when the host reads the question!</div>}
+    </div>
+  );
+}
+
+// ─── Lobby ────────────────────────────────────────────────────────────────────
+function LobbyScreen({ teams, setTeams, rounds, setRounds, onStart }) {
+  const [showQuestions, setShowQuestions] = useState(false);
+
+  function updateTeam(i, field, val) { setTeams(ts => ts.map((t,j)=> j===i ? {...t,[field]:val} : t)); }
+  function updateRound(ri, field, val) { setRounds(rs => rs.map((r,j)=> j===ri ? {...r,[field]:val} : r)); }
+  function updateAnswer(ri, ai, field, val) { setRounds(rs => rs.map((r,j) => j!==ri ? r : {...r, answers: r.answers.map((a,k) => k!==ai ? a : {...a,[field]:val})})); }
+  function addAnswer(ri) { setRounds(rs => rs.map((r,j) => j!==ri ? r : {...r, answers: [...r.answers, { text: '', pts: 10 }]})); }
+  function removeAnswer(ri, ai) { setRounds(rs => rs.map((r,j) => j!==ri ? r : {...r, answers: r.answers.filter((_,k)=>k!==ai)})); }
+  function addRound() { setRounds(rs => [...rs, { question: '', answers: [{ text:'', pts: 10 }] }]); }
+  function removeRound(ri) { setRounds(rs => rs.filter((_,j)=>j!==ri)); }
+
+  return (
+    <div className="lobby">
+      <div className="lobby-title">FAMILY FEUD</div>
+      <div className="lobby-sub">Game Time</div>
+      <div className="section-divider" />
+
+      <div className="teams-row">
+        {teams.map((t, i) => (
+          <div className="team-card" key={i}>
+            <h3>TEAM {i===0?'A':'B'}</h3>
+            <div className="input-label">TEAM NAME</div>
+            <input className="text-input" value={t.name} onChange={e=>updateTeam(i,'name',e.target.value)} placeholder={`Team ${i===0?'A':'B'}`} />
+            <div className="input-label">CHOOSE ICON</div>
+            <div className="emoji-row">
+              {EMOJIS.map(em=>(
+                <button key={em} className={`emoji-btn${t.emoji===em?' selected':''}`} onClick={()=>updateTeam(i,'emoji',em)}>{em}</button>
+              ))}
+            </div>
+            <div style={{textAlign:'center',fontSize:'2.5rem'}}>{t.emoji}</div>
+          </div>
+        ))}
+      </div>
+
+      <div style={{width:'100%',maxWidth:900,marginBottom:8}}>
+        <button className="hc-btn" style={{width:'100%',padding:'12px',fontSize:'0.9rem',letterSpacing:'2px',textAlign:'center',background:'rgba(255,255,255,0.05)',border:'1px dashed rgba(255,255,255,0.2)'}} onClick={()=>setShowQuestions(s=>!s)}>
+          {showQuestions ? '🙈 Hide Questions (Host Only)' : '🔒 Edit Questions — Host Only (tap to expand)'}
+        </button>
+      </div>
+
+      {showQuestions && (
+        <div className="qs-section">
+          <h3>📋 MAIN ROUND QUESTIONS</h3>
+          {rounds.map((r, ri) => (
+            <div className="round-block" key={ri}>
+              <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:8}}>
+                <h4>ROUND {ri+1}</h4>
+                {rounds.length > 1 && <button className="remove-btn" onClick={()=>removeRound(ri)}>✕ Remove Round</button>}
+              </div>
+              <div className="input-label">QUESTION</div>
+              <input className="text-input" value={r.question} onChange={e=>updateRound(ri,'question',e.target.value)} placeholder="Survey says..." />
+              <div className="input-label" style={{marginBottom:8}}>ANSWERS & POINTS</div>
+              {r.answers.map((a, ai) => (
+                <div className="answer-row" key={ai}>
+                  <input className="text-input" value={a.text} onChange={e=>updateAnswer(ri,ai,'text',e.target.value)} placeholder={`Answer ${ai+1}`} />
+                  <input className="pts-input" type="number" value={a.pts} onChange={e=>updateAnswer(ri,ai,'pts',parseInt(e.target.value)||0)} min="1" max="100" />
+                  {r.answers.length > 1 && <button className="remove-btn" onClick={()=>removeAnswer(ri,ai)}>✕</button>}
+                </div>
+              ))}
+              <button className="add-btn" onClick={()=>addAnswer(ri)}>+ Add Answer</button>
+            </div>
+          ))}
+          <button className="add-btn" style={{width:'100%',padding:'10px'}} onClick={addRound}>+ Add Round</button>
+        </div>
+      )}
+
+      <button className="start-btn" onClick={onStart}>START GAME</button>
+    </div>
+  );
+}
+
+// ─── Team Phone Screen ────────────────────────────────────────────────────────
+function TeamPhoneScreen({ teamIdx, teams, round, gameState, onBuzz, onBack }) {
+  const team = teams[teamIdx];
+  const [buzzed, setBuzzed] = useState(false);
+  const buzzedTeam = gameState.buzzer;
+
+  function handleBuzz() {
+    if (buzzed || buzzedTeam !== null) return;
+    setBuzzed(true);
+    onBuzz(teamIdx);
+  }
+
+  return (
+    <div className="phone-screen">
+      <div style={{fontSize:'2.5rem',marginBottom:4}}>{team.emoji}</div>
+      <div className="phone-team-name">{team.name}</div>
+      <div style={{fontSize:'0.75rem',color:'var(--silver)',letterSpacing:'3px',marginBottom:16}}>SCORE: {team.score}</div>
+      <div className="phone-question">
+        {gameState.phase === 'faceoff' || gameState.phase === 'faceoff-reveal' || gameState.phase === 'faceoff-reveal-2' ? round.question
+        : gameState.phase === 'play' || gameState.phase === 'steal' ? round.question
+        : 'Waiting...'}
+      </div>
+      {gameState.phase === 'faceoff' ? (
+        <>
+          <button className={`buzz-btn${buzzed?' buzzed':''}`} onClick={handleBuzz} disabled={buzzedTeam !== null && !buzzed}>
+            {buzzed ? '✓ BUZZED' : 'BUZZ!'}
+          </button>
+          {buzzedTeam !== null && <div style={{marginTop:16,color:'var(--gold)',fontFamily:'Anton',fontSize:'1rem',letterSpacing:'2px'}}>
+            {buzzedTeam===teamIdx ? '⚡ YOU BUZZED FIRST!' : `${teams[buzzedTeam].name} buzzed first`}
+          </div>}
+          <div style={{marginTop:8,fontSize:'0.75rem',color:'var(--silver)'}}>Tap the button as fast as you can!</div>
+        </>
+      ) : (
+        <div style={{textAlign:'center',padding:'20px',background:'rgba(255,255,255,0.04)',borderRadius:10,border:'1px solid var(--blue3)',maxWidth:320,width:'100%'}}>
+          <div style={{fontFamily:'Anton',fontSize:'1.1rem',color:'var(--silver)',letterSpacing:'2px',marginBottom:4}}>
+            {gameState.phase==='play'?'YOUR TEAM IS PLAYING':gameState.phase==='steal'?'STEAL OPPORTUNITY':'WAITING...'}
+          </div>
+          <div style={{fontSize:'0.85rem',color:'rgba(255,255,255,0.5)'}}>Speak your answers aloud</div>
+        </div>
+      )}
+      <button className="hc-btn" style={{marginTop:24,fontSize:'0.8rem'}} onClick={()=>{ setBuzzed(false); onBack(); }}>← Back to Host Screen</button>
+    </div>
+  );
+}
+
+// ─── Fast Money Screen ────────────────────────────────────────────────────────
+function FastMoneyScreen({ fmState, setFmState, teams, gameState, updateFmAnswer, onFinish, onBack }) {
+  const [timerVal, setTimerVal] = useState(30);
+  const [timerRunning, setTimerRunning] = useState(false);
+  const [timerStarted, setTimerStarted] = useState(false);
+  const [showHints, setShowHints] = useState(false);
+  const timerRef = useRef(null);
+
+  useEffect(() => {
+    if (timerRunning && timerVal > 0) {
+      timerRef.current = setTimeout(() => setTimerVal(v => v - 1), 1000);
+      // Don't play a sound on the very first tick (when timer just started at 30)
+      if (timerVal < 30) {
+        if (timerVal <= 5) {
+          playSound('countdown');
+        } else {
+          playSound('tick');
+        }
+      }
+    }
+    if (timerVal === 0 && timerRunning) { setTimerRunning(false); playSound('timerEnd'); }
+    return () => clearTimeout(timerRef.current);
+  }, [timerRunning, timerVal]);
+
+  function toggleTimer() {
+    if (!timerRunning && timerVal === 0) setTimerVal(30);
+    if (!timerRunning) setTimerStarted(true);
+    setTimerRunning(r => !r);
+  }
+  function resetTimer() { setTimerRunning(false); setTimerVal(30); setTimerStarted(false); }
+
+  const p1total = (fmState?.p1pts||[]).reduce((a,b)=>a+b,0);
+  const p2total = (fmState?.p2pts||[]).reduce((a,b)=>a+b,0);
+  const grandTotal = p1total + p2total;
+
+  if (!fmState) return null;
+
+  const isP1 = fmState.phase === 1;
+  const qs = isP1 ? fmState.p1qs : fmState.p2qs;
+  const answers = isP1 ? fmState.p1answers : fmState.p2answers;
+  const pts = isP1 ? fmState.p1pts : fmState.p2pts;
+  const curTotal = isP1 ? p1total : p2total;
+
+  function getMatchedAnswer(answer, qObj) {
+    if (!answer.trim()) return null;
+    const inp = answer.trim().toLowerCase().replace(/[^a-z0-9 ]/g, '').trim();
+    if (!inp) return null;
+    for (const a of qObj.answers) {
+      const aliases = a.aliases || [a.text];
+      for (const alias of aliases) {
+        const al = alias.toLowerCase().replace(/[^a-z0-9 ]/g, '').trim();
+        if (!al) continue;
+        if (al === inp || al.includes(inp) || inp.includes(al)) return a.text;
+      }
+    }
+    return null;
+  }
+
+  return (
+    <div className="fm-screen">
+      <div className="fm-title">FAST MONEY</div>
+      <div className="fm-subtitle">{teams[gameState.controlTeam].emoji} {teams[gameState.controlTeam].name}</div>
+
+      <div style={{display:'flex',alignItems:'center',gap:12,marginBottom:8}}>
+        <div style={{fontFamily:'Anton',fontSize:'2.5rem',color:timerVal<=5?'var(--red2)':timerVal<=10?'var(--gold2)':'var(--gold)',minWidth:60,textAlign:'center',transition:'color 0.3s'}}>{timerVal}s</div>
+        <button className={`hc-btn${timerRunning?' red':' green'}`} onClick={toggleTimer}>{timerRunning?'⏸ Pause':'▶ Start Timer'}</button>
+        <button className="hc-btn" onClick={resetTimer}>↺ Reset (30s)</button>
+      </div>
+      <div className="timer-bar" style={{marginBottom:16}}>
+        <div className="timer-fill" style={{width:`${(timerVal/30)*100}%`,background: timerVal<=5?'var(--red2)':timerVal<=10?'var(--gold)':'linear-gradient(90deg,var(--green),var(--gold))'}} />
+      </div>
+
+      <div style={{display:'flex',gap:10,marginBottom:16,flexWrap:'wrap',justifyContent:'center'}}>
+        <button className={`hc-btn${fmState.phase===1?' gold':''}`} style={{fontSize:'1rem',padding:'10px 22px'}} onClick={()=>{ setFmState(s=>({...s,phase:1})); resetTimer(); setTimerStarted(false); }}>
+          👤 Player 1 — {p1total} pts
+        </button>
+        <button className={`hc-btn${fmState.phase===2?' gold':''}`} style={{fontSize:'1rem',padding:'10px 22px'}} onClick={()=>{ setFmState(s=>({...s,phase:2})); resetTimer(); setTimerStarted(false); }}>
+          👤 Player 2 — {p2total} pts
+        </button>
+      </div>
+
+      <div className="fm-player-box" style={{width:'100%',maxWidth:720}}>
+        <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:10}}>
+          <h3 style={{margin:0}}>PLAYER {fmState.phase} — {curTotal} PTS</h3>
+          <button className={`hc-btn${showHints?' gold':''}`} style={{fontSize:'0.75rem',padding:'5px 12px'}} onClick={()=>setShowHints(h=>!h)}>
+            {showHints ? '🙈 Hide Answers' : '👁 Show Valid Answers'}
+          </button>
+        </div>
+        {!timerStarted && (
+          <div style={{textAlign:'center',padding:'18px',background:'rgba(245,197,24,0.08)',border:'2px dashed rgba(245,197,24,0.4)',borderRadius:8,marginBottom:12,color:'var(--gold)',fontFamily:'Anton',fontSize:'1rem',letterSpacing:'2px'}}>
+            ⏱ START THE TIMER TO UNLOCK ANSWERS
+          </div>
+        )}
+        {qs.map((qObj, qi) => {
+          const matched = getMatchedAnswer(answers[qi], qObj);
+          const hit = pts[qi] > 0;
+          return (
+            <div key={qi} className="fm-q-row" style={{flexDirection:'column',alignItems:'stretch',borderColor: hit?'var(--gold)':answers[qi].trim()?'var(--red)':'rgba(255,255,255,0.06)',background:hit?'rgba(245,197,24,0.08)':answers[qi].trim()&&!hit?'rgba(204,34,0,0.08)':'rgba(255,255,255,0.04)'}}>
+              <div style={{display:'flex',alignItems:'center',gap:10}}>
+                <span className="fm-q-num">{qi+1}</span>
+                <div style={{flex:1}}>
+                  <div className="fm-q-text">{qObj.q}</div>
+                  {matched && hit && <div style={{fontSize:'0.75rem',color:'#7fff7f',marginTop:2,fontFamily:'Barlow Condensed',fontWeight:700,letterSpacing:1}}>✓ Survey says: {matched}</div>}
+                  {answers[qi].trim() && !hit && <div style={{fontSize:'0.75rem',color:'var(--red2)',marginTop:2}}>✗ No match found</div>}
+                </div>
+                <div className="fm-ans-area">
+                  <input
+                    className="fm-answer-input"
+                    value={answers[qi]}
+                    onChange={e=>updateFmAnswer(fmState.phase, qi, e.target.value)}
+                    placeholder={timerStarted ? "Type answer..." : "🔒 locked"}
+                    disabled={!timerStarted}
+                    style={{borderColor:!timerStarted?'rgba(255,255,255,0.1)':hit?'var(--gold)':answers[qi].trim()&&!hit?'var(--red)':undefined,opacity:!timerStarted?0.4:1,cursor:!timerStarted?'not-allowed':'text'}}
+                  />
+                  <span className={`fm-pts-badge${pts[qi]===0?' zero':''}`} style={{background:hit?'var(--gold)':undefined,color:hit?'var(--blue)':undefined}}>
+                    {pts[qi] > 0 ? `+${pts[qi]}` : '—'}
+                  </span>
+                </div>
+              </div>
+              {showHints && (
+                <div style={{marginTop:8,paddingTop:8,borderTop:'1px solid rgba(255,255,255,0.08)',display:'flex',flexWrap:'wrap',gap:6}}>
+                  {qObj.answers.map((a,ai) => (
+                    <span key={ai} style={{background:matched===a.text?'rgba(100,255,100,0.2)':'rgba(255,255,255,0.06)',border:`1px solid ${matched===a.text?'#7fff7f':'rgba(255,255,255,0.12)'}`,borderRadius:4,padding:'2px 8px',fontSize:'0.75rem',color:matched===a.text?'#7fff7f':'var(--silver)',fontFamily:'Barlow Condensed',fontWeight:600}}>
+                      {a.text} <span style={{color:'var(--gold)',fontFamily:'Anton'}}>{a.pts}</span>
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+
+      <div className="fm-total-bar" style={{marginTop:20,fontSize:'1.8rem'}}>
+        🏆 COMBINED TOTAL: <span style={{color:'#7fff7f'}}>{grandTotal} PTS</span>
+        <div style={{fontSize:'0.9rem',color:'var(--silver)',marginTop:4}}>
+          Player 1: {p1total} pts &nbsp;+&nbsp; Player 2: {p2total} pts
+        </div>
+      </div>
+
+      <div style={{display:'flex',gap:12,marginTop:20,flexWrap:'wrap',justifyContent:'center'}}>
+        <button className="start-btn" style={{fontSize:'1.1rem',padding:'12px 32px'}} onClick={onFinish}>🏁 Finish & See Final Scores</button>
+        <button className="hc-btn" onClick={onBack}>← Back to Game</button>
+      </div>
+
+      <div style={{marginTop:12,fontSize:'0.75rem',color:'var(--silver)',textAlign:'center',maxWidth:480,lineHeight:1.6}}>
+        Type answers as players speak them. Points auto-match against survey data — green = match found, red = no match. Switch between Player 1 and Player 2 tabs. Click "Finish" when both players are done to add points to team score.
+      </div>
+    </div>
+  );
+}
+
+// ─── Final Screen ─────────────────────────────────────────────────────────────
+function FinalScreen({ teams, onRestart }) {
+  const winner = teams[0].score >= teams[1].score ? 0 : 1;
+
+  useEffect(() => { playSound('celebrate'); }, []);
+
+  return (
+    <div className="final-screen">
+      <div className="final-title">🏆 GAME OVER 🏆</div>
+      <div className="final-scores">
+        {teams.map((t, i) => (
+          <div key={i} className={`final-team-card${i===winner?' winner':''}`}>
+            <div className="final-emoji">{t.emoji}</div>
+            <div className="final-name">{t.name}</div>
+            <div className="final-pts">{t.score}</div>
+            {i===winner && <div className="final-winner-badge">👑 WINNER</div>}
+          </div>
+        ))}
+      </div>
+      <button className="start-btn" onClick={onRestart}>🔄 Play Again</button>
+    </div>
+  );
+}
+
+ReactDOM.render(<App />, document.getElementById('root'));
+</script>
+</body>
+</html>
